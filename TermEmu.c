@@ -27,7 +27,7 @@ char *commands[] = {
 int cp(char **args);
 int ls(char **args);
 int kills(char **args);
-int end(char **ar);
+int end(char **args);
 
 /**
  * Struct containing available functions to suit commands
@@ -139,7 +139,7 @@ int end(char *args[]){
 
 /*
  * Reads user input from stdin and breaks it into tokenized commands
- * @Returns the tokenzied char array
+ * @Returns the tokenized char array
  */
 char **parseCommands(char delimiters[], char *inputBuffer){
   char **tokenCommands;
@@ -203,26 +203,28 @@ int executeCommands(char *args[]){
     return false;
   }
 }
-
+//*************************** MAIN ********************************************************
 int main(int argc, char *argv[]) {
-  char *inputBuffer = NULL;
-  char delimiters[]= " \n\t";
   char cwd[4096];
-  int isExiting = false;
+  char *inputBuffer = NULL;
   char **args;
+  char delimiters[]= " \n\t";
+  int isExiting = false;
 
-  //Uses a char buffer with an arbitrary length to store the name of the current working directory
+  //From <unistd.h> getcwd() determines the path name of the "current-working-directory" or "cwd"
+  //Uses a char buffer that can store at most, 4096 characters(Linux cwd max) to hold the name of the cwd
   if(getcwd(cwd, sizeof(cwd)) == NULL){
-    //On failure, print error and exity
+    //On failure, print error and exit the terminal
     printf("Error Status %d\n", errno);
     printf("%s\n", strerror(errno));
+    printf("Could not acquire current working directory, exiting...\n");
     exit(EXIT_FAILURE);
   };
 
-  //If commands were not passed beforehand, execute shell
+  //If commands were not passed/piped beforehand, display shell interface
   if(argc <= 1){
-    printf("\nTerminal Successfully Started!\nTry Commands: cp, ls, kill, end\n");
-    printf("Currently in: %s\n", cwd);
+    printf("\nTermina Successfully Started!\nTry Commands: cp, ls, kill, end\n");
+    printf("Current Working Directory: %s\n", cwd);
 
     do{
       printf("\n:> ");
@@ -236,10 +238,9 @@ int main(int argc, char *argv[]) {
     while(!isExiting);
   }
   else{
-      //Execute command without the terminal
+      //Execute piped commands without the terminal
       isExiting = executeCommands(argv + 1);
   }
-
 
   return 0;
 }
