@@ -17,10 +17,10 @@
 #include <signal.h>
 
 /**
- * Struct containing available shell commands
+ * Array containing the implemented shell commands, these can be called to invoke the functionality
  */
 char *commands[] = {
-  "cp", "ls", "kill", "end"
+  "cp", "ls", "kill", "end", "help"
 };
 /********************Shell, User Activated Functions****************************/
 //Function Declarations
@@ -28,6 +28,7 @@ int cp(char **args);
 int ls(char **args);
 int kills(char **args);
 int end(char **args);
+int help(char **args);
 
 /**
  * Struct containing available functions to suit commands
@@ -37,7 +38,8 @@ int (*shellFunc[]) (char **) = {
   &cp,
   &ls,
   &kills,
-  &end
+  &end,
+  &help
 };
 
 /**
@@ -112,20 +114,20 @@ int ls(char *args[]){
   */
 
 int kills(char *args[]){
-  printf("Executing kill command...\n");
+
   if(args[1] == NULL){
-    printf("Please enter a valid Process ID");
+    printf("Kill Command requires a valid Process ID\n");
     return false;
   }
 
   if(kill(atoi(args[1]), 0) == 0){
     //At least one signal was sent, meaning the process still exists
+    printf("Executing kill command...\n");
     kill(atoi(args[1]), SIGKILL);
   }
   else{
-    printf("PID does not exist..?");
+    printf("Unsuccessful operation, perhaps the PID was invalid");
   }
-
 
   return false;
 }
@@ -135,6 +137,14 @@ int kills(char *args[]){
   */
 int end(char *args[]){
   return true;
+}
+
+int help(char *args[]){
+  int i;
+  printf("Hello!, this a simplistic terminal built by Steven Lim using\n");
+  printf("Stephan Brennan's LSH tutorial. It currently supports the following commands...\n");
+  for(i = 0; i <
+  return false;
 }
 
 /*
@@ -223,7 +233,7 @@ int main(int argc, char *argv[]) {
 
   //If commands were not passed/piped beforehand, display shell interface
   if(argc <= 1){
-    printf("\nTermina Successfully Started!\nTry Commands: cp, ls, kill, end\n");
+    printf("\nTermina Shell Successfully Started!\nEnter help for a list of commands\n");
     printf("Current Working Directory: %s\n", cwd);
 
     do{
