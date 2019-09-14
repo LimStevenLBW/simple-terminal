@@ -1,7 +1,5 @@
 /*
- * Steven Lim
- * CS 326 Assignment 2: Basic Terminal
- * This is code for a basic shell that can perform three commands:
+ * This is code for a basic shell that can perform several commands:
  * cp(copy file), ls(list directory), and kill(terminate process)
  */
 
@@ -20,7 +18,7 @@
  * Array containing the implemented shell commands, these can be called to invoke the functionality
  */
 char *commands[] = {
-  "cp", "ls", "kill", "end", "help"
+  "cp", "ls", "kill", "end", "help", "cd"
 };
 /********************Shell, User Activated Functions****************************/
 //Function Declarations
@@ -29,17 +27,19 @@ int ls(char **args);
 int kills(char **args);
 int end(char **args);
 int help(char **args);
+int cd(char **args);
+const char TERMINAL_NAME[] = "Termina";
 
 /**
- * Struct containing available functions to suit commands
- * shellFunc is the array of function pointers
+ * shellFunc is an array of function pointers to terminal commands
  */
 int (*shellFunc[]) (char **) = {
   &cp,
   &ls,
   &kills,
   &end,
-  &help
+  &help,
+  &cd
 };
 
 /**
@@ -143,8 +143,18 @@ int help(char *args[]){
   int i;
   printf("Hello!, this a simplistic terminal built by Steven Lim using\n");
   printf("Stephan Brennan's LSH tutorial. It currently supports the following commands...\n");
-  for(i = 0; i <
-  return false;
+}
+
+int cd(char *args[]){
+  if((args[1]) == NULL){
+    //No Directory inputted
+    fprintf(stderr, "cd command failed, expected directory name into argument\n");
+  }
+  else{
+    if(chdir(args[1]) != 0){
+      perror(TERMINAL_NAME); //Change Directory failed
+    }
+  }
 }
 
 /*
@@ -196,16 +206,17 @@ int executeCommands(char *args[]){
     return false;
   }
   else{
-    //A command argument was entered, parse it for the corresponding function
+    //A command argument was entered, compare it to find a corresponding func
     for(int i = 0; i < commandBuffer; i++){
       if(strcmp(args[0], commands[i]) == 0){
         //printf("MATCH FOUND");
 
+/*
         if(strcmp(args[0], "kill") == 0){
           kills(args);
           return false;
         }
-
+*/
         return ((*shellFunc[i])(args));
       }
     }
@@ -233,7 +244,8 @@ int main(int argc, char *argv[]) {
 
   //If commands were not passed/piped beforehand, display shell interface
   if(argc <= 1){
-    printf("\nTermina Shell Successfully Started!\nEnter help for a list of commands\n");
+    printf("\n" + TERMINAL_NAME + " Shell Successfully Started!\n")
+    printf("Enter help for a list of commands\n");
     printf("Current Working Directory: %s\n", cwd);
 
     do{
